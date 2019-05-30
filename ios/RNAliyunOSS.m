@@ -104,7 +104,8 @@
     
     // read asset data from filepath
     if ([filepath hasPrefix:@"assets-library://"]) {
-        PHAsset *asset = [PHAsset fetchAssetsWithALAssetURLs:@[filepath] options:nil].firstObject;
+        NSURL *url = [NSURL URLWithString: filepath];
+        PHAsset *asset = [PHAsset fetchAssetsWithALAssetURLs:@[url] options:nil].firstObject;
         [self convertToNSDataFromAsset:asset withHandler:callback];
         
     } else if ([filepath hasPrefix:@"localIdentifier://"]) {
