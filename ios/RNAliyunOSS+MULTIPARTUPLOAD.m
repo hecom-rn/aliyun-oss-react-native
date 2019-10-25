@@ -38,9 +38,9 @@ RCT_REMAP_METHOD(initMultipartUpload,withBucketName:(NSString *)bucketName objec
  */
 RCT_REMAP_METHOD(multipartUpload, withBucketName:(NSString *)bucketName objectKey:(NSString *)objectKey uploadId:(NSString*)uploadId withFilePath:(NSString*)filePath  options:(NSDictionary*)options resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
     __block NSMutableArray * partInfos = [NSMutableArray new];
-    filePath = [NSHomeDirectory() stringByAppendingPathComponent:filePath];
+//    filePath = [NSHomeDirectory() stringByAppendingPathComponent:filePath];
     //分片上传数量
-    int chuckCount = 2;
+    int chuckCount = [[options objectForKey:@"chuckCount"] intValue];
     //获取文件大小
     long fileSize;
     NSFileManager* manager =[NSFileManager defaultManager];
@@ -49,14 +49,13 @@ RCT_REMAP_METHOD(multipartUpload, withBucketName:(NSString *)bucketName objectKe
     }
     //分片大小
     uint64_t offset = fileSize/chuckCount;
-    
+    NSFileHandle* readHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
     for (int i = 1; i <= chuckCount; i++) {
         OSSUploadPartRequest * uploadPart = [OSSUploadPartRequest new];
         uploadPart.bucketName = bucketName;
         uploadPart.objectkey = objectKey;
         uploadPart.uploadId = uploadId;
         uploadPart.partNumber = i; // part number start from 1
-        NSFileHandle* readHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
         [readHandle seekToFileOffset:offset * (i -1)];
         NSData* data = [readHandle readDataOfLength:offset];
         uploadPart.uploadPartData = data;
@@ -66,6 +65,13 @@ RCT_REMAP_METHOD(multipartUpload, withBucketName:(NSString *)bucketName objectKe
             OSSUploadPartResult * result = uploadPartTask.result;
             uint64_t fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:uploadPart.uploadPartFileURL.absoluteString error:nil] fileSize];
             [partInfos addObject:[OSSPartInfo partInfoWithPartNum:i eTag:result.eTag size:fileSize]];
+            // Only send events if anyone is listening
+            if (self.hasListeners) {
+                [self sendEventWithName:@"uploadProgress" body:@{@"bytesSent":[NSString stringWithFormat:@"%lld",offset],
+                                                                 @"currentSize": [NSString stringWithFormat:@"%lld", offset * i],
+                                                                 @"totalSize": [NSString stringWithFormat:@"%lld", offset * chuckCount]}];
+            }
+            
         } else {
             NSLog(@"upload part error: %@", uploadPartTask.error);
             return;
@@ -79,6 +85,7 @@ RCT_REMAP_METHOD(multipartUpload, withBucketName:(NSString *)bucketName objectKe
     complete.partInfos = partInfos;
     OSSTask * completeTask = [self.client completeMultipartUpload:complete];
     [[completeTask continueWithBlock:^id(OSSTask *task) {
+        [readHandle closeFile]; // close handle
         if (!task.error) {
             OSSCompleteMultipartUploadResult * result = task.result;
             NSLog(@"upload server success");
