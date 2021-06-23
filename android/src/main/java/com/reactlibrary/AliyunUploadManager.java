@@ -92,7 +92,7 @@ public class AliyunUploadManager {
         // init upload request
         PutObjectRequest put = new PutObjectRequest(bucketName, ossFile, sourceFile);
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("application/octet-stream");
+        // metadata.setContentType("application/octet-stream");
         put.setMetadata(metadata);
 
         final int progressStep = options.hasKey("progressStep") ? options.getInt("progressStep") : 0;
@@ -173,7 +173,7 @@ public class AliyunUploadManager {
 
         AppendObjectRequest append = new AppendObjectRequest(bucketName, objectKey, uploadFilePath);
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("application/octet-stream");
+        // metadata.setContentType("application/octet-stream");
         append.setMetadata(metadata);
 
         //set appendpostions
