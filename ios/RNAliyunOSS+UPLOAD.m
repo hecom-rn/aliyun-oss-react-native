@@ -51,6 +51,7 @@ RCT_REMAP_METHOD(asyncUpload, asyncUploadWithBucketName:(NSString *)bucketName o
             // Only send events if anyone is listening
             if (self.hasListeners) {
                 [self sendEventWithName:@"uploadProgress" body:@{@"bytesSent":[NSString stringWithFormat:@"%lld",bytesSent],
+                                                                 @"filePath": filepath,
                                                                  @"currentSize": [NSString stringWithFormat:@"%lld",totalByteSent],
                                                                  @"totalSize": [NSString stringWithFormat:@"%lld",totalBytesExpectedToSend]}];
             }

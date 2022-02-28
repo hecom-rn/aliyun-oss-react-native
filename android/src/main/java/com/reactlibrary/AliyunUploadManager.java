@@ -66,6 +66,7 @@ public class AliyunUploadManager {
      */
     public void asyncUpload(final ReactContext context, String bucketName, String ossFile, String sourceFile,
                             ReadableMap options, final Promise promise) {
+        String oriSourceFile = sourceFile;
         // Content to file:// start
         Uri selectedVideoUri = Uri.parse(sourceFile);
 
@@ -115,6 +116,7 @@ public class AliyunUploadManager {
                     WritableMap onProgressValueData = Arguments.createMap();
                     onProgressValueData.putString("currentSize", str_currentSize);
                     onProgressValueData.putString("totalSize", str_totalSize);
+                    onProgressValueData.putString("filePath", oriSourceFile);
                     context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                             .emit("uploadProgress", onProgressValueData);
                     lastPercent = percent;
