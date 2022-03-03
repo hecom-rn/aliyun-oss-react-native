@@ -66,7 +66,7 @@ public class AliyunUploadManager {
      */
     public void asyncUpload(final ReactContext context, String bucketName, String ossFile, String sourceFile,
                             ReadableMap options, final Promise promise) {
-        String oriSourceFile = sourceFile;
+        final String oriSourceFile = sourceFile;
         // Content to file:// start
         Uri selectedVideoUri = Uri.parse(sourceFile);
 
