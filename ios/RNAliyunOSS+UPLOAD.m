@@ -66,7 +66,7 @@ RCT_REMAP_METHOD(asyncUpload, asyncUploadWithBucketName:(NSString *)bucketName o
                 resolve(task.description);
             } else {
                 NSLog(@"upload object failed, error: %@" , task.error);
-                reject(@"Error", @"Upload failed", task.error);
+                reject(@"Error", task.error.localizedDescription ?: @"Upload failed", task.error);
             }
             return nil;
         }];
