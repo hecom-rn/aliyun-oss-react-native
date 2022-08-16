@@ -10,11 +10,10 @@ import com.alibaba.sdk.android.oss.common.OSSConstants;
 import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSCustomSignerCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationToken;
+import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.common.utils.IOUtils;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.reactlibrary.utils.ConfigUtils;
 
@@ -28,6 +27,7 @@ public class AliyunAuthManager {
     private OSS mOSS;
     private Context mContext;
     private AuthListener mAuthListener;
+    private String endPoint;
 
     /**
      * AliyunAuthManager constructor
@@ -108,12 +108,16 @@ public class AliyunAuthManager {
                                       String endPoint,
                                       ReadableMap configuration) {
         OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(accessKeyId, accessKeySecret, securityToken);
-
-        // init conf
-        ClientConfiguration conf = ConfigUtils.initAuthConfig(configuration);
-
-        mOSS = new OSSClient(mContext, endPoint, credentialProvider, conf);
-        Log.d("AliyunOSS", "OSS initWithKey ok!");
+        if (mOSS == null || !this.endPoint.equals(endPoint)){
+            // init conf
+            ClientConfiguration conf = ConfigUtils.initAuthConfig(configuration);
+            mOSS = new OSSClient(mContext, endPoint, credentialProvider, conf);
+            this.endPoint = endPoint;
+            Log.d("AliyunOSS", "OSS initWithKey ok!");
+        } else {
+            mOSS.updateCredentialProvider(credentialProvider);
+            Log.d("AliyunOSS", "OSS update credential ok!");
+        }
         mAuthListener.onAuthFinished(mOSS);
     }
 

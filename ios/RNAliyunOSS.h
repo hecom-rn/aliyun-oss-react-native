@@ -14,6 +14,7 @@
 
 @property OSSClient *client;
 @property OSSClientConfiguration *clientConfiguration;
+@property (nonatomic, strong)NSString *endPoint;
 
 @property bool hasListeners;
 
