@@ -5,6 +5,8 @@ import android.util.Log;
 import com.alibaba.sdk.android.oss.ClientException;
 import com.alibaba.sdk.android.oss.ServiceException;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
 public class PromiseExceptionManager {
 
@@ -24,7 +26,12 @@ public class PromiseExceptionManager {
             Log.e("RequestId", serviceException.getRequestId());
             Log.e("HostId", serviceException.getHostId());
             Log.e("RawMessage", serviceException.getRawMessage());
-            promise.reject(serviceException);
+            WritableMap info = new WritableNativeMap();
+            info.putString("ErrorCode", serviceException.getErrorCode());
+            info.putString("RequestId", serviceException.getRequestId());
+            info.putString("HostId", serviceException.getHostId());
+            info.putString("RawMessage", serviceException.getRawMessage());
+            promise.reject(serviceException, info);
         }
     }
 }
