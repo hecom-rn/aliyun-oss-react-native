@@ -1,7 +1,32 @@
 import {DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform} from "react-native";
-const {RNAliyunOSS} = NativeModules;
+// const {RNAliyunOSS} = NativeModules;
+
+import { RTNAliyunOss } from './harmony';
 
 let subscription;
+
+const RNAliyunOSS = Platform.select({
+    ios: NativeModules.RNAliyunOSS,
+    android: NativeModules.RNAliyunOSS,
+    harmony: {
+        multipartUpload(bucketName, objectKey, uploadId, filepath, options) {
+            return RTNAliyunOss.multipartUpload(bucketName, objectKey, uploadId, filepath, options);
+        },
+
+        initMultipartUpload(bucketName, objectKey) {
+            return RTNAliyunOss.initMultipartUpload(bucketName, objectKey);
+        },
+    
+        initWithSecurityToken(securityToken, accessKey, secretKey, endPoint, configuration) {
+            return RTNAliyunOss.initWithSecurityToken(securityToken, accessKey, secretKey, endPoint, configuration);
+        },
+    
+        asyncUpload(bucketName, objectKey, filepath, options) {
+            return RTNAliyunOss.asyncUpload(bucketName, objectKey, filepath, options);
+        },
+    
+    }
+})
 
 //default configuration for OSS Client
 const conf = {
