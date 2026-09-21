@@ -6,6 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "harmony": {
+    "alias": "rtn-aliyun-oss",
+    "codegenConfig": [
+      {
+        "version": 2,
+        "specPaths": [
+          "./harmony/src/specs/v2"
+        ]
+      }
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aliyun/aliyun-oss-react-native.git"
